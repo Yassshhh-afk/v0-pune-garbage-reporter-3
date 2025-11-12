@@ -16,9 +16,7 @@ import { AlertCircle } from "lucide-react"
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [repeatPassword, setRepeatPassword] = useState("")
   const [username, setUsername] = useState("")
-  const [theme, setTheme] = useState("light")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -29,50 +27,35 @@ export default function SignUpPage() {
     setIsLoading(true)
     setError(null)
 
-    if (password !== repeatPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
-    }
-
-    if (!username.trim()) {
-      setError("Username is required")
-      setIsLoading(false)
-      return
-    }
-
-    if (username.length < 3 || username.length > 50) {
-      setError("Username must be between 3 and 50 characters")
-      setIsLoading(false)
-      return
-    }
-
     try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      if (!username || username.length < 3 || username.length > 50) {
+        throw new Error("Username must be between 3 and 50 characters")
+      }
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/admin`,
+          emailRedirectTo:
+            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/sign-up-success`,
+          data: {
+            username: username,
+          },
         },
       })
+
       if (signUpError) throw signUpError
 
-      if (signUpData.user) {
-        const { error: profileError } = await supabase.from("user_profiles").insert({
-          id: signUpData.user.id,
-          username: username.trim(),
-          email: email,
-        })
+      if (data.user) {
+        const { error: profileError } = await supabase.from("user_profiles").insert([
+          {
+            id: data.user.id,
+            username: username,
+            created_at: new Date().toISOString(),
+          },
+        ])
 
-        if (profileError) {
-          if (profileError.message.includes("duplicate key")) {
-            setError("Username already taken. Please choose another.")
-          } else {
-            throw profileError
-          }
-          setIsLoading(false)
-          return
-        }
+        if (profileError) throw profileError
       }
 
       router.push("/auth/sign-up-success")
@@ -90,7 +73,7 @@ export default function SignUpPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Create Account</CardTitle>
-              <CardDescription>Sign up to report garbage and help your community</CardDescription>
+              <CardDescription>Sign up to report garbage and help keep Pune clean</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignUp}>
@@ -100,25 +83,26 @@ export default function SignUpPage() {
                     <Input
                       id="username"
                       type="text"
-                      placeholder="Choose a display name"
+                      placeholder="Choose a username"
                       required
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      disabled={isLoading}
+                      minLength={3}
+                      maxLength={50}
                     />
-                    <p className="text-xs text-muted-foreground">3-50 characters, will be displayed in your comments</p>
+                    <p className="text-xs text-muted-foreground">
+                      3-50 characters. This will be shown with your reviews.
+                    </p>
                   </div>
-
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="admin@example.com"
+                      placeholder="you@example.com"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      disabled={isLoading}
                     />
                   </div>
                   <div className="grid gap-2">
@@ -126,39 +110,14 @@ export default function SignUpPage() {
                     <Input
                       id="password"
                       type="password"
+                      placeholder="Create a strong password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
+                      minLength={6}
                     />
+                    <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="repeat-password">Repeat Password</Label>
-                    <Input
-                      id="repeat-password"
-                      type="password"
-                      required
-                      value={repeatPassword}
-                      onChange={(e) => setRepeatPassword(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="theme">Preferred Theme</Label>
-                    <select
-                      id="theme"
-                      value={theme}
-                      onChange={(e) => setTheme(e.target.value)}
-                      disabled={isLoading}
-                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground text-sm"
-                    >
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
-                      <option value="system">System</option>
-                    </select>
-                  </div>
-
                   {error && (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
@@ -166,7 +125,7 @@ export default function SignUpPage() {
                     </Alert>
                   )}
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creating account..." : "Sign up"}
+                    {isLoading ? "Creating account..." : "Sign Up"}
                   </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">

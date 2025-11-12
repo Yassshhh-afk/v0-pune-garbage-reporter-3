@@ -14,42 +14,14 @@ import { reverseGeocode } from "@/app/actions/get-maps-api-key"
 import { createClient } from "@/lib/supabase/client"
 import { Star, MessageCircle, MapPin, Phone, Search, X, TrendingUp } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { ShareReportButton } from "./share-report-button"
+import { subscribeToReports, subscribeToComments, subscribeToStatusUpdates } from "@/lib/supabase/realtime"
+import type { GarbageMapProps, GarbageReport, ReportStats, Ward } from "@/types" // Importing the missing types
 
 // ... existing types ...
-type GarbageReport = {
-  id: string
-  location_name: string
-  latitude: number
-  longitude: number
-  description: string
-  severity: "low" | "medium" | "high"
-  status: "pending" | "in-progress" | "resolved"
-  photo_url?: string | null
-  created_at: string
-}
 
-type Ward = {
-  id: string
-  ward_name: string
-  address: string
-  phone?: string
-  email?: string
-  latitude: number
-  longitude: number
-}
-
-type ReportStats = {
-  totalReviews: number
-  averageRating: number
-}
-
-type GarbageMapProps = {
-  reports: GarbageReport[]
-  wards: Ward[]
-  userEmail?: string | null
-}
-
-export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
+export function GarbageMap({ reports: initialReports, wards, userEmail, selectedReportId }: GarbageMapProps) {
+  const [reports, setReports] = useState(initialReports)
   const [selectedReport, setSelectedReport] = useState<GarbageReport | null>(null)
   const [address, setAddress] = useState<string | null>(null)
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
@@ -65,6 +37,45 @@ export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
 
   const supabase = createClient()
+
+  useEffect(() => {
+    const unsubscribeReports = subscribeToReports((updatedReports) => {
+      setReports(updatedReports)
+      console.log("[v0] Map updated with latest reports")
+    })
+
+    return () => {
+      unsubscribeReports()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!selectedReport) return
+
+    const unsubscribeComments = subscribeToComments(selectedReport.id, (updatedComments) => {
+      setComments(updatedComments)
+      console.log("[v0] Comments updated in real-time")
+    })
+
+    const unsubscribeStatusUpdates = subscribeToStatusUpdates(selectedReport.id, (updatedStatus) => {
+      setStatusUpdates(updatedStatus)
+      console.log("[v0] Status updates received in real-time")
+    })
+
+    return () => {
+      unsubscribeComments()
+      unsubscribeStatusUpdates()
+    }
+  }, [selectedReport])
+
+  useEffect(() => {
+    if (selectedReportId && initialReports.length > 0) {
+      const reportToSelect = initialReports.find((r) => r.id === selectedReportId)
+      if (reportToSelect) {
+        setSelectedReport(reportToSelect)
+      }
+    }
+  }, [selectedReportId, initialReports])
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -205,9 +216,9 @@ export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
           </Card>
         </div>
 
-        {/* Sidebar Section */}
+        {/* ... existing sidebar code continues (search, statistics, legend, etc.) ... */}
         <div className="flex flex-col gap-4">
-          {/* Search Box - Fixed positioning */}
+          {/* Search Box */}
           <div className="relative">
             <Card className="p-3 border border-gray-200 shadow-sm">
               <div className="relative">
@@ -286,7 +297,6 @@ export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
           <Card className="p-4 border border-gray-200 shadow-sm">
             <h3 className="font-semibold text-gray-900 mb-4">Legend</h3>
             <div className="space-y-4">
-              {/* Report Severity */}
               <div>
                 <h4 className="text-xs font-semibold text-gray-600 uppercase mb-2">Severity</h4>
                 <div className="space-y-2">
@@ -314,7 +324,6 @@ export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
                 </div>
               </div>
 
-              {/* Ward Offices */}
               <div className="border-t border-gray-200 pt-3">
                 <h4 className="text-xs font-semibold text-gray-600 uppercase mb-2">Ward Offices</h4>
                 <div className="flex items-center gap-2">
@@ -336,11 +345,11 @@ export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
               <div className="space-y-2">
                 <div>
                   <p className="text-xs text-gray-600">Office Name</p>
-                  <p className="font-semibold text-gray-900 text-sm mt-1">{nearestWard.ward_name}</p>
+                  <p className="font-medium text-gray-900 text-sm mt-1">{nearestWard.ward_name}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-600">Address</p>
-                  <p className="text-xs text-gray-700 mt-1">{nearestWard.address}</p>
+                  <p className="text-xs text-gray-700 mt-1">{isLoadingAddress ? "Loading..." : address || "N/A"}</p>
                 </div>
                 {nearestWard.phone && (
                   <a
@@ -421,6 +430,15 @@ export function GarbageMap({ reports, wards, userEmail }: GarbageMapProps) {
                   </div>
                 </div>
               </Card>
+
+              <ShareReportButton
+                reportId={selectedReport.id}
+                locationName={selectedReport.location_name}
+                description={selectedReport.description}
+                status={selectedReport.status}
+                rating={reportStats.get(selectedReport.id)?.averageRating || 0}
+                totalReviews={reportStats.get(selectedReport.id)?.totalReviews || 0}
+              />
 
               <Button
                 onClick={() => {

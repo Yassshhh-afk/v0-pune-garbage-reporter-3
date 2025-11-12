@@ -13,7 +13,7 @@ export default async function AdminPage() {
     redirect("/auth/login")
   }
 
-  if (data.user.email !== "kondaneyash@gmail.com") {
+  if (data.user.email !== "kondanayash@gmail.com") {
     redirect("/")
   }
 

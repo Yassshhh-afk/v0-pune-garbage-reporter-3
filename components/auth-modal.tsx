@@ -22,6 +22,7 @@ export function AuthModal({ isOpen, onClose, mode = "login" }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(mode === "login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClient()
@@ -43,6 +44,10 @@ export function AuthModal({ isOpen, onClose, mode = "login" }: AuthModalProps) {
         })
         if (error) throw error
       } else {
+        if (username.length < 3 || username.length > 50) {
+          throw new Error("Username must be between 3 and 50 characters")
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -51,6 +56,16 @@ export function AuthModal({ isOpen, onClose, mode = "login" }: AuthModalProps) {
           },
         })
         if (error) throw error
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+        if (user) {
+          const { error: profileError } = await supabase
+            .from("user_profiles")
+            .upsert({ id: user.id, username: username.trim() }, { onConflict: "id" })
+          if (profileError) throw profileError
+        }
       }
       onClose()
       router.refresh()
@@ -71,6 +86,22 @@ export function AuthModal({ isOpen, onClose, mode = "login" }: AuthModalProps) {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleAuth} className="space-y-4">
+          {!isLogin && (
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Choose a username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                minLength={3}
+                maxLength={50}
+              />
+              <p className="text-xs text-muted-foreground">3-50 characters. This is what other users will see.</p>
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -109,6 +140,7 @@ export function AuthModal({ isOpen, onClose, mode = "login" }: AuthModalProps) {
             onClick={() => {
               setIsLogin(!isLogin)
               setError(null)
+              setUsername("")
             }}
           >
             {isLogin ? "Need an account? Sign up" : "Already have an account? Login"}
