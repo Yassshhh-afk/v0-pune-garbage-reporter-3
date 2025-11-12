@@ -1,4 +1,3 @@
-// ... existing imports ...
 import { GarbageMap } from "@/components/garbage-map"
 import { createClient } from "@/lib/supabase/server"
 
