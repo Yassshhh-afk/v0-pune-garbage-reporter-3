@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { compressImage } from "@/lib/utils/image-compressor"
+import { compressImageAction } from "@/app/actions/compress-image"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -100,7 +100,7 @@ export function ReportForm() {
       setIsLoading(true)
 
       try {
-        const compressedBase64 = await compressImage(base64String)
+        const compressedBase64 = await compressImageAction(base64String)
         setFormData({ ...formData, photoBase64: compressedBase64 })
         setPhotoPreview(compressedBase64)
         setError(null)
