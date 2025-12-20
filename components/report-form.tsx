@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { compressImageAction } from "@/app/actions/compress-image"
+import { compressImage } from "@/lib/utils/client-image-compressor"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -94,24 +94,18 @@ export function ReportForm() {
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = async (event) => {
-      const base64String = event.target?.result as string
-      setIsLoading(true)
-
-      try {
-        const compressedBase64 = await compressImageAction(base64String)
-        setFormData({ ...formData, photoBase64: compressedBase64 })
-        setPhotoPreview(compressedBase64)
-        setError(null)
-      } catch (err) {
-        setError("Failed to process image")
-        console.error("[v0] Image processing error:", err)
-      } finally {
-        setIsLoading(false)
-      }
+    setIsLoading(true)
+    try {
+      const compressedBase64 = await compressImage(file, 1200, 0.8)
+      setFormData({ ...formData, photoBase64: compressedBase64 })
+      setPhotoPreview(compressedBase64)
+      setError(null)
+    } catch (err) {
+      setError("Failed to process image")
+      console.error("[v0] Image processing error:", err)
+    } finally {
+      setIsLoading(false)
     }
-    reader.readAsDataURL(file)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
