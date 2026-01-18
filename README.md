@@ -1,4 +1,4 @@
-# Pune Garbage Reporter
+# 🗑️ Pune Garbage Reporter
 
 A full-stack civic engagement web application that empowers citizens to report garbage and sanitation issues in Pune, India. Built with modern web technologies, this platform enables real-time tracking, community collaboration, and direct communication with municipal ward offices.
 
@@ -6,42 +6,42 @@ A full-stack civic engagement web application that empowers citizens to report g
 [![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js%2016-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![Powered by Supabase](https://img.shields.io/badge/Powered%20by-Supabase-black?style=for-the-badge&logo=supabase)](https://supabase.com)
 
-## Live Demo
+## 🌐 Live Demo
 
 **[https://pune-garbage-reporter.vercel.app](https://pune-garbage-reporter.vercel.app)**
 
-## Features
+## ✨ Features
 
-### Core Functionality
+### 🎯 Core Functionality
 - **Instant Garbage Reporting** - Pin exact locations on Google Maps, upload photos, and submit detailed reports
 - **Automatic Ward Detection** - System automatically identifies the nearest ward office and routes reports to the correct authority
 - **Live Map Tracking** - Interactive map displays all reported issues with real-time status updates
 - **Intelligent Search** - Search for specific locations and instantly view report details
 
-### Community Engagement
+### 👥 Community Engagement
 - **User Reviews & Ratings** - Community members can rate cleanup efforts (1-5 stars) and leave feedback
 - **Google Maps-Style Ratings** - Visual star ratings with average scores and total review counts
 - **User Profiles** - Create accounts with unique usernames displayed on all reviews and comments
 - **Social Sharing** - Share reports directly to WhatsApp, Twitter, or copy links with rich preview metadata
 
-### Real-Time Features
+### ⚡ Real-Time Features
 - **WebSocket Sync** - Live updates across all users when reports, comments, or status changes occur
 - **Status Management** - Ward officials update cleanup progress (Pending → In Progress → Resolved)
 - **Comment System** - Real-time discussions on reports with username attribution
 
-### Admin Dashboard
+### 🛡️ Admin Dashboard
 - **Role-Based Access** - Secure admin panel for municipal officials
 - **Report Management** - View, update, and track all reported issues
 - **Ward Information** - Access contact details and performance metrics
 - **Analytics** - Monitor cleanup statistics and community engagement
 
-### Performance & Optimization
+### 🚀 Performance & Optimization
 - **Image Compression** - Automatic client-side photo compression reducing storage by 70%
 - **Server-Side Rendering** - Fast initial page loads with Next.js App Router
 - **Responsive Design** - Mobile-first UI that works seamlessly across all devices
 - **Modern Preloaders** - Smooth loading experiences with optimized UX
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
 - **Next.js 16** - React framework with App Router and Server Components
@@ -71,7 +71,7 @@ A full-stack civic engagement web application that empowers citizens to report g
 - **Zod** - Schema validation
 - **Lucide React** - Icon library
 
-## Installation
+## 📦 Installation
 
 ### Prerequisites
 - Node.js 18+ installed
@@ -81,8 +81,8 @@ A full-stack civic engagement web application that empowers citizens to report g
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Yassshhh-afk/pune-garbage-reporter.git
-cd pune-garbage-reporter
+git clone https://github.com/Yassshhh-afk/v0-pune-garbage-reporter-3.git
+cd v0-pune-garbage-reporter-3
 ```
 
 ### 2. Install Dependencies
@@ -147,7 +147,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deployment
+## 🚀 Deployment
 
 ### Deploy to Vercel
 
@@ -160,7 +160,7 @@ The easiest way to deploy is using the Vercel Platform:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Yassshhh-afk/v0-pune-garbage-reporter-3)
 
-## Usage
+## 📖 Usage
 
 ### For Citizens
 
@@ -215,7 +215,7 @@ The easiest way to deploy is using the Vercel Platform:
 └── public/                  # Static assets
 ```
 
-## Security Features
+## 🔐 Security Features
 
 - **Row Level Security (RLS)** - Database-level access control
 - **Server-Side Authentication** - Secure session management
@@ -224,7 +224,7 @@ The easiest way to deploy is using the Vercel Platform:
 - **XSS Protection** - Sanitized user inputs
 - **CORS Configuration** - Controlled API access
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -234,15 +234,20 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## 👨‍💻 Developer
 
 **Yash Kondane**
 - Email: kondanayash@gmail.com
-- GitHub: [@Yashkondane](https://github.com/yashkondane)
+- GitHub: [@Yassshhh-afk](https://github.com/Yassshhh-afk)
 - Project Link: [https://pune-garbage-reporter.vercel.app](https://pune-garbage-reporter.vercel.app)
 
 ## 🙏 Acknowledgments
 
+- Built with [v0.app](https://v0.app) by Vercel
 - UI components from [shadcn/ui](https://ui.shadcn.com)
 - Icons from [Lucide](https://lucide.dev)
 - Hosted on [Vercel](https://vercel.com)
